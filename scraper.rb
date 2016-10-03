@@ -169,7 +169,7 @@ class NSWPenalties
         'business_id' => md5(r['address']),
         'date'        => Date.parse(r['offence_date']),
         'link'        => r['link'],
-        'description' => r['offence_code'],
+        'description' => r['offence_nature'],
       }
     end
   end
