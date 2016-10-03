@@ -1,25 +1,73 @@
-# This is a template for a Ruby scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+# Get data from the morph.io api
+require 'rest-client'
+require 'json'
+require 'pry'
+require 'scraperwiki'
+require 'active_support'
+require 'active_support/core_ext'
 
-# require 'scraperwiki'
-# require 'mechanize'
-#
-# agent = Mechanize.new
-#
-# # Read in a page
-# page = agent.get("http://foo.com")
-#
-# # Find somehing on the page using css selectors
-# p page.at('div.content')
-#
-# # Write out to the sqlite database using scraperwiki library
-# ScraperWiki.save_sqlite(["name"], {"name" => "susan", "occupation" => "software developer"})
-#
-# # An arbitrary query against the database
-# ScraperWiki.select("* from data where 'name'='peter'")
 
-# You don't have to do things with the Mechanize or ScraperWiki libraries.
-# You can use whatever gems you want: https://morph.io/documentation/ruby
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+#morph_api_urls = [
+#  'https://api.morph.io/auxesis/vic_health_register_of_convictions/data.json',
+#  'https://api.morph.io/auxesis/nsw_food_authority_penalty_notices/data.json',
+#  'https://api.morph.io/auxesis/nsw_food_authority_prosecution_notices/data.json',
+#]
+
+def url
+  'https://api.morph.io/auxesis/vic_health_register_of_convictions/data.json'
+end
+
+def fetch
+  morph_api_key = ENV['MORPH_API_KEY']
+  params = { :key => morph_api_key, :query => "select * from 'data'" }
+  result = RestClient.get(url, :params => params)
+  @records = JSON.parse(result)
+end
+
+def geocoded
+  @records.select { |r|
+    !r['lat'].blank? && !r['lng'].blank?
+  }
+end
+
+def md5(string)
+  @hash ||= Digest::MD5.new
+  @hash.hexdigest(string)
+end
+
+def businesses
+  return @businesses if @businesses
+
+  @businesses = geocoded.map do |r|
+    {
+      'id'      => md5(r['address']),
+      'name'    => r['trading_name'],
+      'lat'     => r['lat'].to_f,
+      'lng'     => r['lng'].to_f,
+      'address' => r['address'],
+    }
+  end
+
+  @businesses.uniq! {|b| b['id'] }
+end
+
+def offences
+  return @offences if @offences
+
+  @offences = geocoded.map do |r|
+    {
+      'business_id' => md5(r['address']),
+      'date'        => r['conviction_date'],
+      'link'        => r['link'],
+      'description' => r['description'],
+    }
+  end
+end
+
+def save
+  ScraperWiki.save_sqlite(['id'], businesses, 'businesses')
+  ScraperWiki.save_sqlite(['link'], offences, 'offences')
+end
+
+fetch
+save
