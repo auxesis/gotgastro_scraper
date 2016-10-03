@@ -5,7 +5,7 @@ require 'pry'
 require 'scraperwiki'
 require 'active_support'
 require 'active_support/core_ext'
-
+require 'date'
 
 #morph_api_urls = [
 #  'https://api.morph.io/auxesis/vic_health_register_of_convictions/data.json',
@@ -57,7 +57,7 @@ def offences
   @offences = geocoded.map do |r|
     {
       'business_id' => md5(r['address']),
-      'date'        => r['conviction_date'],
+      'date'        => Date.parse(r['conviction_date']),
       'link'        => r['link'],
       'description' => r['description'],
     }
