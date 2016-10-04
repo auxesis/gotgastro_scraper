@@ -7,6 +7,11 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'date'
 
+if ENV['MORPH_API_KEY'].blank?
+  puts "Must have MORPH_API_KEY set"
+  exit(1)
+end
+
 class Victoria
   def url
     'https://api.morph.io/auxesis/vic_health_register_of_convictions/data.json'
