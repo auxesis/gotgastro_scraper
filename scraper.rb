@@ -244,14 +244,32 @@ class WA
   end
 end
 
+def existing_business_ids
+  ScraperWiki.select('id from businesses').map {|r| r['id']}
+rescue SqliteMagic::NoSuchTable
+  []
+end
+
+def existing_offence_ids
+  ScraperWiki.select('link from offences').map {|r| r['id']}
+rescue SqliteMagic::NoSuchTable
+  []
+end
+
 sources = [ Victoria.new, NSWPenalties.new, NSWProsecutions.new, WA.new]
-puts "Fetching #{sources.size} data sets"
+puts "Fetching #{sources.size} data sets."
 sources.each {|s| s.fetch }
 
 businesses = sources.map(&:businesses).flatten
-puts "Number of businesses: #{businesses.size}"
+puts "Total number of businesses: #{businesses.size}"
 offences = sources.map(&:offences).flatten
-puts "Number of offences:   #{offences.size}"
+puts "Total number of offences:   #{offences.size}"
+
+new_businesses = businesses.select {|b| !existing_business_ids.include?(b['id']) }
+new_offences   = offences.select {|b| !existing_offence_ids.include?(b['id']) }
+
+puts "### There are #{new_businesses.size} new businesses"
+puts "### There are #{new_offences.size} new offences"
 
 ScraperWiki.save_sqlite(['id'], businesses, 'businesses')
 ScraperWiki.save_sqlite(['link'], offences, 'offences')
