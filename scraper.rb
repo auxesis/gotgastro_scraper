@@ -52,6 +52,8 @@ class Victoria
     end
 
     @businesses.uniq! {|b| b['id'] }
+
+    @businesses
   end
 
   def offences
@@ -108,6 +110,8 @@ class NSWProsecutions
     end
 
     @businesses.uniq! {|b| b['id'] }
+
+    @businesses
   end
 
   def offences
@@ -164,6 +168,8 @@ class NSWPenalties
     end
 
     @businesses.uniq! {|b| b['id'] }
+
+    @businesses
   end
 
   def offences
