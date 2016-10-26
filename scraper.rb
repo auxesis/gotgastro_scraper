@@ -268,10 +268,10 @@ offences = sources.map(&:offences).flatten
 puts "Total number of offences:   #{offences.size}"
 
 new_businesses = businesses.select {|b| !existing_business_ids.include?(b['id']) }
-new_offences   = offences.select {|b| !existing_offence_ids.include?(b['id']) }
+new_offences   = offences.select   {|o| !existing_offence_ids.include?(o['link']) }
 
 puts "### There are #{new_businesses.size} new businesses"
 puts "### There are #{new_offences.size} new offences"
 
-ScraperWiki.save_sqlite(['id'], businesses, 'businesses')
-ScraperWiki.save_sqlite(['link'], offences, 'offences')
+ScraperWiki.save_sqlite(['id'], new_businesses, 'businesses')
+ScraperWiki.save_sqlite(['link'], new_offences, 'offences')
