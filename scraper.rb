@@ -245,13 +245,15 @@ class WA
 end
 
 def existing_business_ids
-  ScraperWiki.select('id from businesses').map {|r| r['id']}
+  return @cached if @cached
+  @cached = ScraperWiki.select('id from businesses').map {|r| r['id']}
 rescue SqliteMagic::NoSuchTable
   []
 end
 
 def existing_offence_ids
-  ScraperWiki.select('link from offences').map {|r| r['id']}
+  return @cached if @cached
+  @cached = ScraperWiki.select('link from offences').map {|r| r['id']}
 rescue SqliteMagic::NoSuchTable
   []
 end
