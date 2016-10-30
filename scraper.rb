@@ -248,13 +248,6 @@ class WA
   end
 end
 
-def existing_business_ids
-  return @cached_businesses if @cached_businesses
-  @cached_businesses = ScraperWiki.select('id from businesses').map {|r| r['id']}
-rescue SqliteMagic::NoSuchTable
-  []
-end
-
 class SA
   def url
     'https://api.morph.io/auxesis/sa_health_food_prosecutions_register/data.json'
@@ -312,6 +305,13 @@ class SA
       }
     end
   end
+end
+
+def existing_business_ids
+  return @cached_businesses if @cached_businesses
+  @cached_businesses = ScraperWiki.select('id from businesses').map {|r| r['id']}
+rescue SqliteMagic::NoSuchTable
+  []
 end
 
 def existing_offence_ids
