@@ -65,6 +65,7 @@ class Victoria
         'date'        => Date.parse(r['conviction_date']),
         'link'        => r['link'],
         'description' => r['description'],
+        'severity'    => 'major',
       }
     end
   end
@@ -123,6 +124,7 @@ class NSWProsecutions
         'date'        => Date.parse(r['offence_date']),
         'link'        => r['link'],
         'description' => r['description'],
+        'severity'    => 'major',
       }
     end
   end
@@ -181,6 +183,7 @@ class NSWPenalties
         'date'        => Date.parse(r['offence_date']),
         'link'        => r['link'],
         'description' => r['offence_nature'],
+        'severity'    => 'minor',
       }
     end
   end
@@ -239,6 +242,7 @@ class WA
         'date'        => Date.parse(r['date_of_conviction']),
         'link'        => r['notice_pdf_url'],
         'description' => r['offence_details'],
+        'severity'    => 'major',
       }
     end
   end
@@ -304,6 +308,7 @@ class SA
         'date'        => Date.parse(r['court_decision_date']),
         'link'        => r['link'],
         'description' => r['offence_nature'],
+        'severity'    => 'major',
       }
     end
   end
