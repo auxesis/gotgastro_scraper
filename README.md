@@ -1,6 +1,6 @@
 This scraper aggregates and normalises datasets for [gotgastroagain.com](https://gotgastroagain.com).
 
-**Learn how to [add a new dataset](https://github.com/auxesis/gastro/blob/master/docs/contributing-datasets.markdown)**
+**Learn how to [add a new dataset](https://github.com/auxesis/gastro/blob/master/docs/contributing-datasets.markdown).**
 
 It currently pulls in data from:
 
