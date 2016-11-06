@@ -1,5 +1,7 @@
 This scraper aggregates and normalises datasets for [gotgastroagain.com](https://gotgastroagain.com).
 
+**Learn how to [add a new dataset](https://github.com/auxesis/gastro/blob/master/docs/contributing-datasets.markdown)**
+
 It currently pulls in data from:
 
  - New South Wales: [auxesis/nsw_food_authority_penalty_notices](https://morph.io/auxesis/nsw_food_authority_penalty_notices)
