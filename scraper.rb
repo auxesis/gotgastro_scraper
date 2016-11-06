@@ -41,7 +41,7 @@ module Source
     end
     base.class_eval do
       def description
-        self.class.description
+        self.class.description || self.class.to_s.split('::',2)[1]
       end
     end
     SOURCES << base.new
