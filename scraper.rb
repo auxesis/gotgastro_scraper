@@ -12,364 +12,6 @@ if ENV['MORPH_API_KEY'].blank?
   exit(1)
 end
 
-class Victoria
-  def url
-    'https://api.morph.io/auxesis/vic_health_register_of_convictions/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(r['address']),
-        'name'    => r['trading_name'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => r['address'],
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(r['address']),
-        'date'        => Date.parse(r['conviction_date']),
-        'link'        => r['link'],
-        'description' => r['description'],
-        'severity'    => 'major',
-      }
-    end
-  end
-end
-
-class NSWProsecutions
-  def url
-    'https://api.morph.io/auxesis/nsw_food_authority_prosecution_notices/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(r['offence_address']),
-        'name'    => r['trading_name'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => r['offence_address'],
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(r['offence_address']),
-        'date'        => Date.parse(r['offence_date']),
-        'link'        => r['link'],
-        'description' => r['description'],
-        'severity'    => 'major',
-      }
-    end
-  end
-end
-
-class NSWPenalties
-  def url
-    'https://api.morph.io/auxesis/nsw_food_authority_penalty_notices/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(r['address']),
-        'name'    => r['trading_name'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => r['address'],
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(r['address']),
-        'date'        => Date.parse(r['offence_date']),
-        'link'        => r['link'],
-        'description' => r['offence_nature'],
-        'severity'    => 'minor',
-      }
-    end
-  end
-end
-
-class WA
-  def url
-    'https://api.morph.io/auxesis/wa_health_food_offenders/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(r['business_location']),
-        'name'    => r['business_name'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => r['business_location'],
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(r['business_location']),
-        'date'        => Date.parse(r['date_of_conviction']),
-        'link'        => r['notice_pdf_url'],
-        'description' => r['offence_details'],
-        'severity'    => 'major',
-      }
-    end
-  end
-end
-
-class SA
-  def url
-    'https://api.morph.io/auxesis/sa_health_food_prosecutions_register/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(r['address']),
-        'name'    => r['trading_name'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => r['address'],
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(r['address']),
-        'date'        => Date.parse(r['court_decision_date']),
-        'link'        => r['link'],
-        'description' => r['offence_nature'],
-        'severity'    => 'major',
-      }
-    end
-  end
-end
-
-class UKFSA
-  def url
-    'https://api.morph.io/auxesis/uk_fsa_food_law_prosecutions/data.json'
-  end
-
-  def morph_api_key
-    ENV['MORPH_API_KEY']
-  end
-
-  def fetch
-    params = { :key => morph_api_key, :query => "select * from 'data'" }
-    result = RestClient.get(url, :params => params)
-    @records = JSON.parse(result)
-  end
-
-  def geocoded
-    @records.select { |r|
-      !r['lat'].blank? && !r['lng'].blank?
-    }
-  end
-
-  def md5(string)
-    @hash ||= Digest::MD5.new
-    @hash.hexdigest(string)
-  end
-
-  def id(attrs)
-    [ attrs['address'], attrs['county'], attrs['postcode'] ].join(', ')
-  end
-
-  def businesses
-    return @businesses if @businesses
-
-    @businesses = geocoded.map do |r|
-      {
-        'id'      => md5(id(r)),
-        'name'    => r['trading_name'] || r['food_business_operator'] || r['defendant'],
-        'lat'     => r['lat'].to_f,
-        'lng'     => r['lng'].to_f,
-        'address' => [ r['address'], r['county'], r['postcode'] ].join(', ')
-      }
-    end
-
-    @businesses.uniq! {|b| b['id'] }
-
-    @businesses
-  end
-
-  def offences
-    return @offences if @offences
-
-    @offences = geocoded.map do |r|
-      {
-        'business_id' => md5(id(r)),
-        'date'        => Date.parse(r['date_of_conviction']),
-        'link'        => r['link'],
-        'description' => r['nature_of_offence'],
-        'severity'    => 'major',
-      }
-    end
-  end
-end
-
 def existing_business_ids
   return @cached_businesses if @cached_businesses
   @cached_businesses = ScraperWiki.select('id from businesses').map {|r| r['id']}
@@ -384,14 +26,67 @@ rescue SqliteMagic::NoSuchTable
   []
 end
 
-sources = [ Victoria.new, NSWPenalties.new, NSWProsecutions.new, WA.new, SA.new, UKFSA.new ]
-puts "Fetching #{sources.size} data sets."
+SOURCES = []
+
+module Source
+  def self.included(base)
+    base.instance_eval do
+      def description(*args)
+        if args.size > 0
+          @description = args.join(' ')
+        else
+          @description
+        end
+      end
+    end
+    base.class_eval do
+      def description
+        self.class.description
+      end
+    end
+    SOURCES << base.new
+  end
+end
+
+def sources
+  @sources ||= SOURCES.dup
+end
+
+def pretty_print_data_sources(sources)
+  puts "### Detected #{sources.size} sources"
+  puts
+  jurisdictions = {}
+  sources.each do |source|
+    jurisdiction = source.class.to_s.split('::').first
+    jurisdictions[jurisdiction] ||= []
+    jurisdictions[jurisdiction] << source.description
+  end
+
+  jurisdictions.sort.each do |jurisdiction, descriptions|
+    puts "#{jurisdiction}:"
+    puts
+    descriptions.sort.each do |description|
+      puts " - #{description}"
+    end
+    puts
+  end
+end
+
+root = Pathname.new(__FILE__).parent
+$: << root.to_s
+glob = root + 'sources' + '*.rb'
+files = Pathname.glob(glob)
+files.each { |f| require(f.to_s) }
+
+pretty_print_data_sources(sources)
+
+puts "### Fetching data from #{sources.size} sources"
 sources.each {|s| s.fetch }
 
 businesses = sources.map(&:businesses).flatten
-puts "Total number of businesses: #{businesses.size}"
+puts "### Total number of businesses: #{businesses.size}"
 offences = sources.map(&:offences).flatten
-puts "Total number of offences:   #{offences.size}"
+puts "### Total number of offences:   #{offences.size}"
 
 new_businesses = businesses.select {|b| !existing_business_ids.include?(b['id']) }
 new_offences   = offences.select   {|o| !existing_offence_ids.include?(o['link']) }
