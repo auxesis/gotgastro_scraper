@@ -54,7 +54,7 @@ module Australia
         {
           'business_id' => md5(r['business_address']),
           'date'        => Date.parse(r['offence_date']),
-          'link'        => r['link'],
+          'link'        => "#{r['link']}##{r['id']}",
           'description' => "Penalty: _#{r['imposed_penalty']}_. #{r['offence']}",
           'severity'    => 'major',
         }
